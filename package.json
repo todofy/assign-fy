@@ -17,7 +17,8 @@
     "express": "^4.13.4",
     "github": "^0.2.4",
     "request": "^2.72.0",
-    "sprintf": "^0.1.5"
+    "sprintf": "^0.1.5",
+    "sync-request": "^3.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
