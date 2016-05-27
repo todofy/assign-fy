@@ -55,15 +55,75 @@ function downloadBlame(repo, branch, file, cachePath) {
 	return res.body.toString();
 }
 
-function findAssignees(repo, branch, file, line) {
+// Sync function to parse blame HTML data and return a 
+// structured array data
+function parseBlame(blameHTML) {
+	var re = /(rel="(?:author|contributor)">([^<]+)<\/a> authored|<tr class="blame-line">)/g;
+	var lines = [];
+	var currentAuthor = null;
+	var match;
+
+	while (match = re.exec(blameHTML)) {
+		if (match[2]) {
+	      	currentAuthor = match[2];
+	    } else {
+	      	lines.push(currentAuthor);
+	    }
+	}
+
+	return lines;
+}
+
+// function to return a dictionery with distict score
+// for each user, from blameData.
+// initial score for each user = 0;
+function distinctUsers(users) {
+	var dUsers = {};
+	users.forEach(function(user, index) {
+		if (typeof dUsers[user] == 'undefined') {
+			dUsers[user] = 0;
+		}
+	});
+
+	return dUsers;
+}
+
+// function to compute score for each user based on
+// linear formula.
+// TODO: check various versions of this formula
+function computeScore(score, blameData, lineNo) {
+	var M = 10;
+	var C = 10;
+
+	// from lineNo to zero.
+	var t = lineNo;
+	while (--t>= 0) {
+		score[blameData[t]] += M / ((lineNo - t) + 1) + C;
+	}
+
+	t = lineNo;
+	while (++t < blameData.length) {
+		score[blameData[t]] += M / ((t - lineNo) + 1) + C;
+	}
+
+	return score;
+}
+
+// function to find the potential assignee for a
+// given repo, branch, file and lineNo
+function findAssignees(repo, branch, file, lineNo) {
 	// Download the blame file
 	var blameHTML = downloadBlame(repo, branch, file, config.server.cachePath);
 
 	// Parse the blame file
+	var blameData = parseBlame(blameHTML);
+	var maxLines = blameData.length;
 
+	// Get the score for each distict user
+	var score = distinctUsers(blameData);
 
-
-	return {'mebjas': 1};
+	// Now score each user based on the blame data
+	return computeScore(score, blameData, lineNo);
 }
 
 module.exports = {
