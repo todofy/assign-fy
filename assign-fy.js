@@ -92,8 +92,8 @@ function distinctUsers(users) {
 // linear formula.
 // TODO: check various versions of this formula
 function computeScore(score, blameData, lineNo) {
-	var M = 10;
-	var C = 10;
+	var M = 1;
+	var C = 0;
 
 	// from lineNo to zero.
 	var t = lineNo;
@@ -106,7 +106,45 @@ function computeScore(score, blameData, lineNo) {
 		score[blameData[t]] += M / ((t - lineNo) + 1) + C;
 	}
 
-	return score;
+	var final = {};
+	var sum = 0;
+	Object.keys(score).forEach(function(user) {
+		sum += score[user];
+	});
+
+	Object.keys(score).forEach(function(user) {
+		final[user] = score[user] / sum;
+	});
+
+	return final;
+}
+
+// function to sort a @param: dict on value and
+// return at max @param: max no of values
+function sortAndCut(dict, max) {
+	// this is needed to sort values as integers
+	function sortNumber(a,b) {
+	   return b - a;
+	}
+
+	// Create items array
+	var items = Object.keys(dict).map(function(key) {
+	    return [key, dict[key]];
+	});
+
+	// Sort the array based on the second element
+	items.sort(function(first, second) {
+	    return second[1] - first[1];
+	});
+
+	// Create a new array with only the first max items
+	items = items.slice(0, max);
+	var nDict = {};
+	items.forEach(function(item, index) {
+		nDict[item[0]] = item[1];
+	});
+
+	return nDict;
 }
 
 // function to find the potential assignee for a
@@ -123,7 +161,10 @@ function findAssignees(repo, branch, file, lineNo) {
 	var score = distinctUsers(blameData);
 
 	// Now score each user based on the blame data
-	return computeScore(score, blameData, lineNo);
+	return sortAndCut(
+		computeScore(score, blameData, lineNo),
+		config.assignFy.maxAssignment
+	);
 }
 
 module.exports = {

@@ -35,11 +35,10 @@ app.get('/', function (req, res) {
 
 	res.setHeader('Content-Type', 'application/json');
     // res.send(JSON.stringify({ status: 200, error: false, assignee: 'mebjas' }, null, 3));
-    res.json({ status: 200, error: false, assignee: assignees });
+    res.json({ status: 200, error: false, assignee: assignees});
 });
 
 app.listen(config.server.port, function () {
   console.log("Node server started on port: %d", config.server.port);
-
   // TODO(mebjas): server should clear cache directory everytime it stats
 });
