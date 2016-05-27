@@ -12,6 +12,7 @@
   "config": {},
   "dependencies": {
     "babel": "^6.5.2",
+    "babel-cli": "^6.9.0",
     "babel-core": "^6.9.0",
     "babel-polyfill": "^6.9.0",
     "express": "^4.13.4",
