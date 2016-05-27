@@ -1,0 +1,16 @@
+{
+	"server" : {
+		"port": 80
+	},
+	"assignFy" : {
+		"maxAssignment" : 3
+	},
+	"credentials": {
+		"username": "",
+		"password": "",
+		"token": ""
+	},
+	"fs": {
+		"cachePath": "./__cache__"
+	}
+}
